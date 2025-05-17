@@ -26,7 +26,7 @@ const Hero = () => {
   useEffect(() => {
     const getMyProfile = async () => {
       const { data } = await axios.get(
-        "https://personal-portfolio-backend-zuwv.onrender.com/api/v1/user/portfolio/me",
+        "https://backend-1-986s.onrender.com/api/v1/user/portfolio/me",
         { withCredentials: true }
       );
       setUser(data.user);

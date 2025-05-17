@@ -52,7 +52,7 @@ const Contact = () => {
     setLoading(true);
     await axios
       .post(
-        "https://personal-portfolio-backend-zuwv.onrender.com/api/v1/message/send",
+        "https://backend-1-986s.onrender.com/api/v1/message/send",
         { senderName, subject, message },
         {
           withCredentials: true,
