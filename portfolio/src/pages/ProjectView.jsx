@@ -60,7 +60,10 @@ const ProjectView = () => {
     getProject();
   }, [id]);
 
-  const descriptionList = description.split(". ").filter(item => item.trim() !== "");
+  const descriptionList = description
+  .split(/\n|(?<=\.)\s(?![^\[]*\])/g) // split by newline or period+space, but not inside [] (for emojis)
+  .map(item => item.trim())
+  .filter(item => item.length > 0);
   const technologiesList = technologies.split(", ").filter(item => item.trim() !== "");
 
   const navigateTo = useNavigate();
