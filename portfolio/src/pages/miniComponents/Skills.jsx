@@ -4,10 +4,63 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles, ArrowRight } from "lucide-react";
 
+const SkillsSkeleton = () => (
+  <motion.div 
+    className="w-full flex flex-col gap-8 sm:gap-12 bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900 p-8 rounded-2xl shadow-xl text-blue-50"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+  >
+    <div className="relative">
+      <div className="text-[2rem] sm:text-[2.75rem] md:text-[3rem] lg:text-[3.8rem] tracking-[15px] mx-auto w-fit font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200">
+        <div className="h-10 w-48 bg-blue-900/40 rounded animate-pulse mb-2"></div>
+      </div>
+      <div className="absolute w-full h-1 top-7 sm:top-7 md:top-8 lg:top-11 z-[-1] bg-blue-500/30"></div>
+    </div>
+    <div className="flex items-center mb-8">
+      <span className="text-blue-300 text-base mr-2">🛠️</span>
+      <span className="text-blue-200 text-base font-medium">
+        Sharpening pencils for my skills... Please wait!
+      </span>
+    </div>
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+      {[...Array(5)].map((_, idx) => (
+        <div
+          key={idx}
+          className="h-fit p-6 flex flex-col justify-center items-center gap-4 rounded-lg border border-blue-500/20 
+          bg-gradient-to-b from-blue-900/80 to-sky-900/30 backdrop-blur-sm transition-all duration-300 
+          shadow-lg shadow-blue-500/10 relative overflow-hidden"
+        >
+          <div className="absolute -top-12 -right-12 w-24 h-24 bg-blue-500/10 rounded-full blur-xl" />
+          <div className="relative p-1 rounded-full mb-2">
+            <div className="h-16 sm:h-24 w-16 bg-blue-900/40 rounded-full animate-pulse" />
+          </div>
+          <div className="text-center flex flex-col gap-1 w-full">
+            <div className="h-4 w-20 bg-blue-900/40 rounded mx-auto animate-pulse mb-2"></div>
+            <div className="flex items-center justify-center gap-1 text-xs">
+              <div className="h-3 w-12 bg-blue-900/30 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+        </div>
+      ))}
+    </div>
+    <div className="w-full flex justify-center mt-8">
+      <div 
+        className="px-6 py-3 bg-blue-900/30 backdrop-blur-sm rounded-full text-sm text-blue-300 border border-blue-500/20 flex items-center gap-2"
+      >
+        <Sparkles size={14} className="text-blue-400" />
+        <span>Loading skills... The suspense is skill-ing us!</span>
+      </div>
+    </div>
+  </motion.div>
+);
+
 const Skills = () => {
   const [skills, setSkills] = useState([]);
   const [hoveredIndex, setHoveredIndex] = useState(null);
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const getMySkills = async () => {
       const { data } = await axios.get(
@@ -15,6 +68,7 @@ const Skills = () => {
         { withCredentials: true }
       );
       setSkills(data.skills);
+      setLoading(false);
     };
     getMySkills();
   }, []);
@@ -71,6 +125,8 @@ const Skills = () => {
     const levels = ["Beginner", "Intermediate", "Advanced", "Expert", "Master"];
     return levels[index % levels.length];
   };
+
+  if (loading) return <SkillsSkeleton />;
 
   return (
     <motion.div 

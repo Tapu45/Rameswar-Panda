@@ -1,11 +1,46 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import Loading from "@/components/ui/Loading"; // Import the Loading component
+
+const TimelineSkeleton = () => (
+  <motion.div 
+    className="w-full bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900 p-8 rounded-2xl shadow-xl text-blue-50"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    transition={{ duration: 0.4 }}
+  >
+    <div className="overflow-x-hidden text-[2rem] sm:text-[1.75rem] md:text-[2.2rem] lg:text-[2.8rem] mb-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200 tracking-wide">
+      <div className="h-8 w-48 bg-blue-900/40 rounded animate-pulse mb-2"></div>
+    </div>
+    <div className="flex items-center mb-8">
+      <span className="text-blue-300 text-base mr-2">🕰️</span>
+      <span className="text-blue-200 text-base font-medium">
+        Assembling the time machine... Please wait!
+      </span>
+    </div>
+    <ol className="relative border-s-2 border-blue-600/40 ml-3">
+      {[...Array(3)].map((_, idx) => (
+        <li className="mb-10 ms-6" key={idx}>
+          <span className="absolute flex items-center justify-center w-7 h-7 bg-blue-900 rounded-full -start-3.5 ring-8 ring-gray-900/80 shadow-lg shadow-blue-500/20">
+            <span className="w-3 h-3 bg-blue-200 rounded-full animate-pulse"></span>
+          </span>
+          <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-lg border border-blue-500/10 shadow-lg">
+            <div className="mb-2 h-6 w-32 bg-blue-900/40 rounded animate-pulse"></div>
+            <div className="flex items-center mb-3">
+              <div className="h-4 w-24 bg-blue-900/30 rounded-full animate-pulse"></div>
+            </div>
+            <div className="h-4 w-full bg-blue-900/20 rounded animate-pulse mb-2"></div>
+            <div className="h-4 w-3/4 bg-blue-900/20 rounded animate-pulse"></div>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </motion.div>
+);
 
 const Timeline = () => {
   const [timeline, setTimeline] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getMyTimeline = async () => {
@@ -18,16 +53,17 @@ const Timeline = () => {
       } catch (error) {
         // Optionally handle error
       } finally {
-        setLoading(false); // Set loading to false after fetch
+        setLoading(false);
       }
     };
     getMyTimeline();
   }, []);
 
-  // Show loading component while loading
-  if (loading) return <Loading text="Loading Timeline..." />;
+  if (loading) return <TimelineSkeleton />;
 
-  // Animation variants
+  // ...rest of your Timeline component remains unchanged...
+  // (keep your animation variants and rendering logic as before)
+  // ...existing code...
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
