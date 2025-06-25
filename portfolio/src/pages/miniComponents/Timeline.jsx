@@ -1,19 +1,31 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import Loading from "@/components/ui/Loading"; // Import the Loading component
 
 const Timeline = () => {
   const [timeline, setTimeline] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
+
   useEffect(() => {
     const getMyTimeline = async () => {
-      const { data } = await axios.get(
-        "https://backend-1-986s.onrender.com/api/v1/timeline/getall",
-        { withCredentials: true }
-      );
-      setTimeline(data.timelines);
+      try {
+        const { data } = await axios.get(
+          "https://backend-1-986s.onrender.com/api/v1/timeline/getall",
+          { withCredentials: true }
+        );
+        setTimeline(data.timelines);
+      } catch (error) {
+        // Optionally handle error
+      } finally {
+        setLoading(false); // Set loading to false after fetch
+      }
     };
     getMyTimeline();
   }, []);
+
+  // Show loading component while loading
+  if (loading) return <Loading text="Loading Timeline..." />;
 
   // Animation variants
   const containerVariants = {
