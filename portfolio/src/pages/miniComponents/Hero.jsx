@@ -78,7 +78,7 @@ const Hero = () => {
   return (
     <>
       <motion.div
-        className="hidden md:block w-full bg-transparent p-8 rounded-2xl shadow-xl text-blue-50"
+        className="block w-full bg-transparent p-8 rounded-2xl shadow-xl text-blue-50"
         initial="hidden"
         animate="visible"
         variants={containerVariants}
@@ -117,13 +117,13 @@ const Hero = () => {
               variants={itemVariants}
             >
               <Typewriter
-               words={[
-    "FULLSTACK DEVELOPER",
-    "SOFTWARE DEVELOPER",
-    "FRONTEND DEVELOPER",
-    "BACKEND DEVELOPER",
-    "DEVOPS ENGINEER"
-  ]}
+                words={[
+                  "FULLSTACK DEVELOPER",
+                  "SOFTWARE DEVELOPER",
+                  "FRONTEND DEVELOPER",
+                  "BACKEND DEVELOPER",
+                  "DEVOPS ENGINEER"
+                ]}
                 loop={50}
                 cursor
                 typeSpeed={70}
@@ -233,7 +233,7 @@ const Hero = () => {
         />
       </motion.div>
 
-      <div className="block md:hidden  flex items-center justify-center ">
+      {/* <div className="block md:hidden  flex items-center justify-center ">
         <ProfileCard
           name="Rameswar Panda"
           title="Software Engineer"
@@ -246,7 +246,7 @@ const Hero = () => {
           enableMobileTilt={false}
           onContactClick={() => console.log('Contact clicked')}
         />
-      </div>
+      </div> */}
     </>
   );
 };
