@@ -6,18 +6,18 @@ import ProjectView from "./pages/ProjectView";
 import Footer from "./pages/miniComponents/Footer";
 import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
-// import { initializeAnalytics, logPageView } from "./lib/analytics"; // Import Analytics Utility
+import { initializeAnalytics, logPageView } from "./lib/analytics"; // Import Analytics Utility
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-//   useEffect(() => {
-//     initializeAnalytics(); // Initialize Google Analytics
-//   }, []);
+  useEffect(() => {
+    initializeAnalytics(); // Initialize Google Analytics
+  }, []);
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Router>
-        {/* <PageTracker /> Component to track page views */}
+        <PageTracker />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/project/:id" element={<ProjectView />} />
@@ -27,17 +27,17 @@ function App() {
       </Router>
     </ThemeProvider>
   );
-// }
+}
 
 // // PageTracker Component for Tracking Route Changes
-// const PageTracker = () => {
-//   const location = useLocation();
+const PageTracker = () => {
+  const location = useLocation();
 
-//   useEffect(() => {
-//     logPageView(location.pathname); // Log page views on route change
-//   }, [location]);
+  useEffect(() => {
+    logPageView(location.pathname); // Log page views on route change
+  }, [location]);
 
-//   return null;
+  return null;
 };
 
 export default App;

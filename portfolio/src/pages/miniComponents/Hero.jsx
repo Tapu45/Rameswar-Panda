@@ -207,7 +207,7 @@ const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
             >
-              {user.aboutMe}
+              {"I turn coffee into code and bugs into features. If you've scrolled this far, you might as well stick around till the end—there could be a plot twist!"}
             </motion.p>
           </div>
 
