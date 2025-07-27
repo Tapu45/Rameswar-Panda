@@ -1,16 +1,14 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useState, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const TimelineSkeleton = () => (
-  <motion.div 
-    className="w-full bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900 p-8 rounded-2xl shadow-xl text-blue-50"
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    transition={{ duration: 0.4 }}
-  >
-    <div className="overflow-x-hidden text-[2rem] sm:text-[1.75rem] md:text-[2.2rem] lg:text-[2.8rem] mb-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200 tracking-wide">
-      <div className="h-8 w-48 bg-blue-900/40 rounded animate-pulse mb-2"></div>
+  <div className="w-full p-8 rounded-2xl shadow-xl text-blue-50 animate-pulse">
+    <div className="overflow-x-hidden text-3xl mb-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200 tracking-wide">
+      <div className="h-8 w-48 bg-blue-900/40 rounded mb-2"></div>
     </div>
     <div className="flex items-center mb-8">
       <span className="text-blue-300 text-base mr-2">🕰️</span>
@@ -18,29 +16,29 @@ const TimelineSkeleton = () => (
         Assembling the time machine... Please wait!
       </span>
     </div>
-    <ol className="relative border-s-2 border-blue-600/40 ml-3">
-      {[...Array(3)].map((_, idx) => (
-        <li className="mb-10 ms-6" key={idx}>
-          <span className="absolute flex items-center justify-center w-7 h-7 bg-blue-900 rounded-full -start-3.5 ring-8 ring-gray-900/80 shadow-lg shadow-blue-500/20">
-            <span className="w-3 h-3 bg-blue-200 rounded-full animate-pulse"></span>
-          </span>
-          <div className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-lg border border-blue-500/10 shadow-lg">
-            <div className="mb-2 h-6 w-32 bg-blue-900/40 rounded animate-pulse"></div>
-            <div className="flex items-center mb-3">
-              <div className="h-4 w-24 bg-blue-900/30 rounded-full animate-pulse"></div>
-            </div>
-            <div className="h-4 w-full bg-blue-900/20 rounded animate-pulse mb-2"></div>
-            <div className="h-4 w-3/4 bg-blue-900/20 rounded animate-pulse"></div>
+    <div className="relative w-full">
+      <div className="flex space-x-8 min-w-[600px]">
+        {[...Array(3)].map((_, idx) => (
+          <div
+            key={idx}
+            className="flex flex-col items-center min-w-[260px] max-w-[260px]"
+          >
+            <div className="w-4 h-4 bg-blue-400 rounded-full mb-2"></div>
+            <div className="h-32 w-full bg-blue-900/40 rounded-lg mb-2"></div>
+            <div className="h-4 w-3/4 bg-blue-900/20 rounded mb-1"></div>
+            <div className="h-4 w-1/2 bg-blue-900/20 rounded"></div>
           </div>
-        </li>
-      ))}
-    </ol>
-  </motion.div>
+        ))}
+      </div>
+    </div>
+  </div>
 );
 
 const Timeline = () => {
   const [timeline, setTimeline] = useState([]);
   const [loading, setLoading] = useState(true);
+  const timelineRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
   useEffect(() => {
     const getMyTimeline = async () => {
@@ -59,150 +57,95 @@ const Timeline = () => {
     getMyTimeline();
   }, []);
 
+  useEffect(() => {
+    if (!loading && scrollContainerRef.current) {
+      let ctx = gsap.context(() => {
+        const container = scrollContainerRef.current;
+        const cards = container.querySelectorAll(".timeline-item-horizontal");
+        const totalWidth = container.scrollWidth;
+        const viewportWidth = container.clientWidth;
+        const scrollLength = totalWidth - viewportWidth;
+
+        gsap.to(container, {
+          x: () => `-${scrollLength}px`,
+          ease: "none",
+          scrollTrigger: {
+            trigger: timelineRef.current,
+            start: "top top",
+            end: () => `+=${scrollLength}`,
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+      }, timelineRef);
+
+      return () => ctx.revert();
+    }
+  }, [loading, timeline]);
+
   if (loading) return <TimelineSkeleton />;
 
-  // ...rest of your Timeline component remains unchanged...
-  // (keep your animation variants and rendering logic as before)
-  // ...existing code...
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        duration: 0.5,
-      },
-    },
-  };
-
-  const titleVariants = {
-    hidden: { y: -20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 100,
-        duration: 0.6 
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { x: -20, opacity: 0 },
-    visible: i => ({
-      x: 0,
-      opacity: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 70,
-        damping: 15,
-        delay: i * 0.1 
-      },
-    }),
-  };
-
   return (
-    <motion.div 
-      className="w-full bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900 p-8 rounded-2xl shadow-xl text-blue-50"
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
+    <div
+      ref={timelineRef}
+      className="w-full max-w-8xl mx-auto p-8 rounded-3xl shadow-2xl text-blue-50  border border-blue-800/30"
     >
-      <motion.h1 
-        className="overflow-x-hidden text-[2rem] sm:text-[1.75rem] md:text-[2.2rem] lg:text-[2.8rem] mb-6 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200 tracking-wide"
-        variants={titleVariants}
-      >
-        Timeline
-      </motion.h1>
-      
-      <motion.ol 
-        className="relative border-s-2 border-blue-600/40 ml-3"
-        variants={containerVariants}
-      >
-        {timeline &&
-          timeline.map((element, index) => {
-            return (
-              <motion.li 
-                className="mb-10 ms-6" 
+      <h1 className="text-4xl md:text-5xl mb-10 font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-300 to-cyan-200 tracking-wide text-center drop-shadow-lg">
+        My Journey
+      </h1>
+      <div className="relative w-full" style={{ height: 350 }}>
+        <div
+          ref={scrollContainerRef}
+          className="flex space-x-12 min-w-full px-2 relative z-10 will-change-transform"
+          style={{ height: 350, position: "relative" }}
+        >
+          {/* Horizontal line only as wide as the cards */}
+          <div
+            className="absolute left-0 top-1/2 h-1 bg-gradient-to-r from-blue-700 via-cyan-400/60 to-blue-700 rounded-full z-0"
+            style={{
+              width: `calc(${timeline.length} * 260px + ${(timeline.length - 1) * 3}rem)`, // 260px card + 3rem (12) gap
+              minWidth: "260px",
+              transform: "translateY(-50%)",
+            }}
+          />
+          {timeline &&
+            timeline.map((element, index) => (
+              <div
+                className="timeline-item-horizontal flex flex-col items-center min-w-[260px] max-w-[260px] relative group"
                 key={element._id}
-                custom={index}
-                variants={itemVariants}
-                whileHover={{ x: 5 }}
-                transition={{ type: "spring", stiffness: 400 }}
               >
-                <motion.span 
-                  className="absolute flex items-center justify-center w-7 h-7 bg-blue-900 rounded-full -start-3.5 ring-8 ring-gray-900/80 shadow-lg shadow-blue-500/20"
-                  whileHover={{ 
-                    scale: 1.2,
-                    backgroundColor: "#3b82f6",
-                    transition: { duration: 0.2 }
-                  }}
-                >
-                  <motion.svg
-                    className="w-3 h-3 text-blue-200"
+                {/* Dot */}
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-700 via-cyan-400 to-blue-900 rounded-full border-4 border-blue-900 shadow-xl mb-4 z-20 flex items-center justify-center animate-pulse">
+                  <svg
+                    className="w-3 h-3 text-blue-100"
                     aria-hidden="true"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    initial={{ rotate: -90 }}
-                    animate={{ rotate: 0 }}
-                    transition={{ delay: index * 0.1 + 0.3, duration: 0.5 }}
                   >
-                    <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z" />
-                  </motion.svg>
-                </motion.span>
-                
-                <motion.div
-                  className="p-4 bg-slate-800/60 backdrop-blur-sm rounded-lg border border-blue-500/10 shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 + 0.2, duration: 0.5 }}
-                >
-                  <motion.h3 
-                    className="mb-2 text-xl font-bold text-blue-300 tracking-wide"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.1 + 0.3 }}
-                  >
+                    <circle cx="10" cy="10" r="10" />
+                  </svg>
+                </div>
+                {/* Card */}
+                <div className="p-6 bg-gradient-to-br from-slate-800/80 via-blue-900/60 to-cyan-900/30 backdrop-blur-lg rounded-2xl border border-blue-500/20 shadow-xl hover:shadow-cyan-400/30 transition-all duration-300 hover:scale-[1.025] w-full">
+                  <h3 className="mb-2 text-xl font-bold text-blue-200 tracking-wide group-hover:text-cyan-200 transition-colors duration-200 text-center">
                     {element.title}
-                  </motion.h3>
-                  
-                  <motion.time 
-                    className="flex items-center mb-3 text-sm font-medium text-blue-400/80 bg-blue-900/30 w-fit px-3 py-1 rounded-full"
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 + 0.4 }}
-                  >
-                    <motion.span
-                      className="inline-block w-2 h-2 mr-2 bg-blue-400 rounded-full"
-                      animate={{ 
-                        scale: [1, 1.2, 1],
-                        opacity: [0.7, 1, 0.7]
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        repeatType: "reverse"
-                      }}
-                    ></motion.span>
+                  </h3>
+                  <time className="flex items-center justify-center mb-3 text-sm font-semibold text-cyan-300 bg-blue-900/40 w-full px-4 py-1 rounded-full shadow-inner">
+                    <span className="inline-block w-2 h-2 mr-2 bg-cyan-400 rounded-full animate-pulse"></span>
                     {element.timeline.from} - {element.timeline.to ? element.timeline.to : "Present"}
-                  </motion.time>
-                  
-                  <motion.p 
-                    className="text-base font-normal text-blue-100/70 leading-relaxed"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: index * 0.1 + 0.5 }}
-                  >
+                  </time>
+                  <p className="text-base font-normal text-blue-100/80 leading-relaxed text-center">
                     {element.description}
-                  </motion.p>
-                </motion.div>
-              </motion.li>
-            );
-          })}
-      </motion.ol>
-    </motion.div>
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
   );
 };
 

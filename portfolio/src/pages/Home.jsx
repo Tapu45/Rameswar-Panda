@@ -10,6 +10,7 @@ import Contact from "./miniComponents/Contact";
 import Footer from "./miniComponents/Footer";
 import Navbar from "../components/ui/navbar";
 import { motion, useScroll, useSpring } from "framer-motion";
+import DarkVeil from "@/animation/bg";
 
 const Home = () => {
   // Scroll progress indicator animation
@@ -48,8 +49,21 @@ const Home = () => {
 
   return (
     <ThemeProvider defaultTheme="dark">
+      <div className="fixed inset-0 -z-20 w-full h-full">
+        <DarkVeil
+          hueShift={20}
+          noiseIntensity={0.04}
+          scanlineIntensity={0.08}
+          speed={0.7}
+          scanlineFrequency={0.04}
+          warpAmount={0.07}
+          resolutionScale={1}
+        />
+      </div>
       {/* Navbar */}
-      <Navbar />
+      {/* <div className="hidden md:block">
+  <Navbar />
+</div> */}
       
       {/* Scroll Progress Bar */}
       <motion.div
@@ -58,15 +72,12 @@ const Home = () => {
       />
       
       {/* Background Gradients */}
-      <div className="fixed inset-0 bg-gray-950 -z-10">
-        <div className="absolute w-[700px] h-[700px] rounded-full bg-blue-950/20 blur-[150px] top-[-250px] right-[-250px]" />
-        <div className="absolute w-[700px] h-[700px] rounded-full bg-blue-900/20 blur-[150px] bottom-[-250px] left-[-250px]" />
-      </div>
+     
       
       {/* Main Content */}
-      <article className="w-full px-3 md:px-4 flex flex-col gap-10 pt-20">
+      <article className="w-full px-3 md:px-4 flex flex-col gap-10 md:pt-20">
         {/* Hero Section */}
-        <SectionWrapper className="mt-6 md:mt-10" id="home">
+        <SectionWrapper className="mt-6 md:mt-0" id="home">
           <Hero />
         </SectionWrapper>
         

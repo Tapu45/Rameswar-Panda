@@ -1,8 +1,7 @@
-import { Card } from "@/components/ui/card";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 const SkillsSkeleton = () => (
   <motion.div 
@@ -23,25 +22,25 @@ const SkillsSkeleton = () => (
         Sharpening pencils for my skills... Please wait!
       </span>
     </div>
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+    <div className="flex justify-center gap-8 mb-6">
       {[...Array(5)].map((_, idx) => (
-        <div
-          key={idx}
-          className="h-fit p-6 flex flex-col justify-center items-center gap-4 rounded-lg border border-blue-500/20 
-          bg-gradient-to-b from-blue-900/80 to-sky-900/30 backdrop-blur-sm transition-all duration-300 
-          shadow-lg shadow-blue-500/10 relative overflow-hidden"
-        >
-          <div className="absolute -top-12 -right-12 w-24 h-24 bg-blue-500/10 rounded-full blur-xl" />
-          <div className="relative p-1 rounded-full mb-2">
-            <div className="h-16 sm:h-24 w-16 bg-blue-900/40 rounded-full animate-pulse" />
-          </div>
-          <div className="text-center flex flex-col gap-1 w-full">
-            <div className="h-4 w-20 bg-blue-900/40 rounded mx-auto animate-pulse mb-2"></div>
-            <div className="flex items-center justify-center gap-1 text-xs">
-              <div className="h-3 w-12 bg-blue-900/30 rounded-full animate-pulse"></div>
+        <div key={idx} className="w-20 h-20 rounded-full bg-blue-900/30 border-2 border-blue-700/40 flex items-center justify-center shadow-lg animate-pulse" />
+      ))}
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
+      {[...Array(2)].map((_, colIdx) => (
+        <div key={colIdx} className="flex flex-col gap-6">
+          {[...Array(4)].map((__, idx) => (
+            <div key={idx}>
+              <div className="flex justify-between items-center mb-1">
+                <div className="h-5 w-32 bg-blue-900/40 rounded mb-2 animate-pulse"></div>
+                <div className="h-4 w-10 bg-blue-900/40 rounded animate-pulse"></div>
+              </div>
+              <div className="w-full h-3 bg-blue-900/40 rounded-full overflow-hidden">
+                <div className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-blue-900 rounded-full animate-pulse" style={{ width: "60%" }} />
+              </div>
             </div>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
+          ))}
         </div>
       ))}
     </div>
@@ -56,9 +55,22 @@ const SkillsSkeleton = () => (
   </motion.div>
 );
 
+const marqueeAnimation = {
+  animate: {
+    x: ["0%", "-50%"],
+    transition: {
+      x: {
+        repeat: Infinity,
+        repeatType: "loop",
+        duration: 18,
+        ease: "linear"
+      }
+    }
+  }
+};
+
 const Skills = () => {
   const [skills, setSkills] = useState([]);
-  const [hoveredIndex, setHoveredIndex] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -108,33 +120,23 @@ const Skills = () => {
     }),
   };
 
-  // Generate random colors for cards
-  const getGradient = (index) => {
-    const gradients = [
-      "from-blue-900/80 to-sky-900/30", 
-      "from-indigo-900/80 to-blue-900/30",
-      "from-purple-900/80 to-indigo-900/30",
-      "from-slate-800/80 to-blue-900/30",
-      "from-slate-900/80 to-indigo-900/30"
-    ];
-    return gradients[index % gradients.length];
-  };
-
-  // Get skill level description
-  const getSkillLevel = (index) => {
-    const levels = ["Beginner", "Intermediate", "Advanced", "Expert", "Master"];
-    return levels[index % levels.length];
-  };
-
   if (loading) return <SkillsSkeleton />;
+
+  // Split skills into two columns
+  const leftSkills = skills.filter((_, i) => i % 2 === 0);
+  const rightSkills = skills.filter((_, i) => i % 2 === 1);
+
+  // Marquee: duplicate logos for seamless loop
+  const allLogos = [...skills, ...skills];
 
   return (
     <motion.div 
-      className="w-full flex flex-col gap-8 sm:gap-12 bg-gradient-to-br from-gray-900 via-blue-950 to-slate-900 p-8 rounded-2xl shadow-xl text-blue-50"
+      className="w-full flex flex-col gap-10  p-8 rounded-2xl shadow-xl bg-slate-800/40 text-blue-50"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
+      {/* Title */}
       <motion.div className="relative" variants={titleVariants}>
         <motion.h1 
           className="text-[2rem] sm:text-[2.75rem] md:text-[3rem] 
@@ -153,133 +155,55 @@ const Skills = () => {
         ></motion.span>
       </motion.div>
 
-      <motion.div 
-        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
-        variants={containerVariants}
+      {/* Logos Reel Marquee */}
+      <div
+        className="relative w-full overflow-hidden mb-8"
+        style={{ height: "6rem" }}
       >
-        {skills &&
-          skills.map((element, index) => {
-            return (
-              <motion.div
-                key={element._id}
-                custom={index}
-                variants={cardVariants}
-                whileHover={{ 
-                  scale: 1.05, 
-                  transition: { type: "spring", stiffness: 400 }
-                }}
-                whileTap={{ scale: 0.95 }}
-                onHoverStart={() => setHoveredIndex(index)}
-                onHoverEnd={() => setHoveredIndex(null)}
-              >
-                <Card
-                  className={`h-fit p-6 flex flex-col justify-center items-center gap-4 rounded-lg border border-blue-500/20 
-                  bg-gradient-to-b ${getGradient(index)} backdrop-blur-sm transition-all duration-300 
-                  shadow-lg shadow-blue-500/10 hover:shadow-blue-400/30 relative overflow-hidden`}
-                >
-                  {/* Card decoration */}
-                  <motion.div 
-                    className="absolute -top-12 -right-12 w-24 h-24 bg-blue-500/10 rounded-full blur-xl"
-                    animate={{ 
-                      scale: hoveredIndex === index ? 1.5 : 1,
-                      opacity: hoveredIndex === index ? 0.3 : 0.1
-                    }}
-                    transition={{ duration: 0.8 }}
-                  />
-                  
+        <motion.div
+          className="flex gap-10 items-center"
+          style={{
+            width: "max-content",
+            minWidth: "100%",
+          }}
+          {...marqueeAnimation}
+        >
+          {allLogos.map((tool, idx) => (
+            <div
+              key={tool._id + idx}
+              className="w-20 h-20 rounded-full bg-blue-900/30 border-2 border-blue-700/40 flex items-center justify-center shadow-lg flex-shrink-0"
+            >
+              <img src={tool.svg?.url} alt={tool.title} className="h-12 w-12" />
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Two-column Skills Bars */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 w-full">
+        {[leftSkills, rightSkills].map((column, colIdx) => (
+          <div key={colIdx} className="flex flex-col gap-6">
+            {column.map((skill, idx) => (
+              <div key={skill._id}>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-blue-100 font-medium">{skill.title}</span>
+                  <span className="text-blue-300 font-mono text-xs">{skill.proficiency}%</span>
+                </div>
+                <div className="w-full h-3 bg-blue-900/40 rounded-full overflow-hidden">
                   <motion.div
-                    initial={{ rotate: -5 }}
-                    whileHover={{ 
-                      rotate: 5, 
-                      scale: 1.2,
-                      transition: { type: "spring", stiffness: 300 }
-                    }}
-                    className="relative group"
-                  >
-                    {/* Animated sparkles icon */}
-                    {hoveredIndex === index && (
-                      <motion.div 
-                        className="absolute -top-4 -right-4 text-yellow-300 opacity-0 group-hover:opacity-100"
-                        initial={{ scale: 0, rotate: 0 }}
-                        animate={{ 
-                          scale: [0, 1.2, 1],
-                          rotate: [0, 20, 0],
-                          opacity: [0, 1, 0.8] 
-                        }}
-                        transition={{ 
-                          duration: 0.7,
-                          repeat: 1,
-                          repeatType: "reverse" 
-                        }}
-                      >
-                        <Sparkles size={16} />
-                      </motion.div>
-                    )}
-                    
-                    <motion.div className="relative p-1 rounded-full">
-                      <motion.div 
-                        className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-cyan-400/20"
-                        animate={{ 
-                          scale: hoveredIndex === index ? 1.1 : 1
-                        }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      <motion.img
-                        src={element.svg && element.svg.url}
-                        alt={element.title}
-                        className="h-16 sm:h-24 w-auto relative z-10"
-                        initial={{ filter: "grayscale(100%)" }}
-                        animate={{ 
-                          filter: hoveredIndex === index ? "grayscale(0%)" : "grayscale(80%)",
-                          scale: hoveredIndex === index ? 1.05 : 1
-                        }}
-                        transition={{ duration: 0.3 }}
-                      />
-                    </motion.div>
-                  </motion.div>
-                  
-                  <motion.div className="text-center flex flex-col gap-1">
-                    <motion.p 
-                      className="text-blue-200 font-semibold tracking-wide"
-                      animate={{ 
-                        opacity: hoveredIndex === index ? 1 : 0.8,
-                        y: hoveredIndex === index ? -2 : 0
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      {element.title}
-                    </motion.p>
-                    
-                    {/* Skill level indicator that appears on hover */}
-                    <motion.div
-                      className="flex items-center justify-center gap-1 text-xs"
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ 
-                        opacity: hoveredIndex === index ? 1 : 0,
-                        height: hoveredIndex === index ? 'auto' : 0
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <span className="text-blue-400/80">{getSkillLevel(index)}</span>
-                      <ArrowRight size={10} className="text-blue-400/60" />
-                    </motion.div>
-                  </motion.div>
-                  
-                  {/* Bottom glow effect */}
-                  <motion.div 
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400/50 to-transparent"
-                    initial={{ scaleX: 0 }}
-                    animate={{ 
-                      scaleX: hoveredIndex === index ? 1 : 0
-                    }}
-                    transition={{ duration: 0.4 }}
+                    className="h-full bg-gradient-to-r from-cyan-400 via-blue-500 to-blue-900 rounded-full"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${skill.proficiency}%` }}
+                    transition={{ duration: 0.8, delay: idx * 0.05, type: "spring" }}
                   />
-                </Card>
-              </motion.div>
-            );
-          })}
-      </motion.div>
-      
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Footer */}
       <motion.div
         className="w-full flex justify-center mt-8"
         initial={{ opacity: 0 }}
