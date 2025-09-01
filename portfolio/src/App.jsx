@@ -8,6 +8,7 @@ import { ToastContainer } from "react-toastify";
 import { useEffect } from "react";
 import { initializeAnalytics, logPageView } from "./lib/analytics"; // Import Analytics Utility
 import "react-toastify/dist/ReactToastify.css";
+import { Analytics } from "@vercel/analytics/react";
 
 function App() {
   useEffect(() => {
@@ -25,6 +26,7 @@ function App() {
         <Footer />
         <ToastContainer position="bottom-right" theme="dark" />
       </Router>
+      <Analytics /> {/* Add this line here */}
     </ThemeProvider>
   );
 }
